@@ -18,6 +18,8 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
+    implementation("org.ktorm:ktorm-core:3.5.0")
+
 }
 
 tasks.withType<KotlinCompile>() {

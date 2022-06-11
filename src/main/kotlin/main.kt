@@ -1,10 +1,12 @@
-import androidx.compose.desktop.DesktopMaterialTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -19,6 +21,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import org.ktorm.database.Database
 import java.net.ServerSocket
 import java.nio.charset.Charset
 import kotlin.concurrent.thread
@@ -75,6 +78,7 @@ fun main() = application {
                 onClick = {
                     writer.write((inputValue + '\n').toByteArray(Charset.defaultCharset()))
                     runServer(server)
+
                 }
             ) {
                 Text(
@@ -92,9 +96,10 @@ fun main() = application {
 }
 
 fun runServer(server: ServerSocket) {
+    val database =  Database.connect("jdbc:mysql://localhost:3306/Server_Network_project", user = "root", password = "7777")
     while (true) {
         val client = server.accept()
         println("Client connected: ${client.inetAddress.hostAddress}")
-        thread { ClientHandler(client).run() }
+        thread { ClientHandler(client).run(database) }
     }
 }
