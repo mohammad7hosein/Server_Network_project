@@ -19,7 +19,8 @@ repositories {
 dependencies {
     implementation(compose.desktop.currentOs)
     implementation("org.ktorm:ktorm-core:3.5.0")
-
+//    implementation("org.slf4j:slf4j-api:1.7.25")
+//    implementation("org.slf4j:slf4j-log4j12:1.7.25")
 }
 
 tasks.withType<KotlinCompile>() {

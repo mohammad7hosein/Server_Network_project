@@ -77,8 +77,7 @@ fun main() = application {
                 shape = RoundedCornerShape(15.dp),
                 onClick = {
                     writer.write((inputValue + '\n').toByteArray(Charset.defaultCharset()))
-                    runServer(server)
-
+                    runServer(server, inputValue.toInt())
                 }
             ) {
                 Text(
@@ -95,9 +94,18 @@ fun main() = application {
 
 }
 
-fun runServer(server: ServerSocket) {
-    val database =  Database.connect("jdbc:mysql://localhost:3306/Server_Network_project", user = "root", password = "7777")
-    while (true) {
+fun runServer(server: ServerSocket, clientNumber: Int) {
+
+    val database = Database.connect(
+        url = "jdbc:mysql://localhost:3306/network_project",
+        driver = "com.mysql.cj.jdbc.Driver",
+        user = "root",
+        password = "@Mohamad77"
+    )
+
+    var clientNumber = clientNumber
+    while (clientNumber > 0) {
+        clientNumber--
         val client = server.accept()
         println("Client connected: ${client.inetAddress.hostAddress}")
         thread { ClientHandler(client).run(database) }
