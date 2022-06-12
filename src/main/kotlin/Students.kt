@@ -15,4 +15,5 @@ object Students : Table<Nothing>("student_table") {
     val courseThree = float("course_three")
     val courseFour = float("course_four")
     val courseFive = float("course_five")
+    val average = float("average")
 }

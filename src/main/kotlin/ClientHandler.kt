@@ -1,5 +1,5 @@
 import org.ktorm.database.Database
-import org.ktorm.dsl.insert
+import org.ktorm.dsl.*
 import java.io.OutputStream
 import java.net.Socket
 import java.nio.charset.Charset
@@ -17,11 +17,43 @@ class ClientHandler(client: Socket) {
             try {
                 val clientId = reader.nextLine().toInt()
                 val text = reader.nextLine()
-                when(text) {
-                    "min" -> {}
-                    "max" -> {}
-                    "avg" -> {}
-                    "sort" -> {}
+                when (text) {
+                    "min" -> {
+                        val query = database.from(Students)
+                            .select(Students.firstName, Students.lastName, Students.nationalCode, min(Students.average))
+                            .where { Students.clientId eq clientId }
+                        write(query.totalRecords.toString())
+                        query.forEach { row ->
+                            write("${row[Students.firstName]},${row[Students.lastName]},${row[Students.nationalCode]},${row[Students.average]}")
+                        }
+                    }
+                    "max" -> {
+                        val query = database.from(Students)
+                            .select(Students.firstName, Students.lastName, Students.nationalCode, max(Students.average))
+                            .where { Students.clientId eq clientId }
+                        write(query.totalRecords.toString())
+                        query.forEach { row ->
+                            write("${row[Students.firstName]},${row[Students.lastName]},${row[Students.nationalCode]},${row[Students.average]}")
+                        }
+                    }
+                    "avg" -> {
+                        val query = database.from(Students)
+                            .select(Students.firstName, Students.lastName, Students.nationalCode, Students.average)
+                            .where { Students.clientId eq clientId }
+                        write(query.totalRecords.toString())
+                        query.forEach { row ->
+                            write("${row[Students.firstName]},${row[Students.lastName]},${row[Students.nationalCode]},${row[Students.average]}")
+                        }
+                    }
+                    "sort" -> {
+                        val query = database.from(Students)
+                            .select(Students.firstName, Students.lastName, Students.nationalCode, Students.average)
+                            .where { Students.clientId eq clientId }.orderBy(Students.average.asc())
+                        write(query.totalRecords.toString())
+                        query.forEach { row ->
+                            write("${row[Students.firstName]},${row[Students.lastName]},${row[Students.nationalCode]},${row[Students.average]}")
+                        }
+                    }
                     "student" -> {
                         database.insert(Students) {
                             set(it.clientId, clientId)
@@ -34,6 +66,10 @@ class ClientHandler(client: Socket) {
                             set(it.courseThree, reader.nextLine().toFloat())
                             set(it.courseFour, reader.nextLine().toFloat())
                             set(it.courseFive, reader.nextLine().toFloat())
+                            set(
+                                it.average,
+                                (it.courseOne + it.courseTwo + it.courseThree + it.courseFour + it.courseFive) / 5f
+                            )
                         }
                     }
                     else -> println("Invalid Input")
@@ -45,7 +81,7 @@ class ClientHandler(client: Socket) {
         }
     }
 
-     private fun write(message: String) {
+    private fun write(message: String) {
         writer.write((message + '\n').toByteArray(Charset.defaultCharset()))
     }
 
