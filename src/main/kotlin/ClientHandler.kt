@@ -20,18 +20,18 @@ class ClientHandler(client: Socket) {
                 when (text) {
                     "min" -> {
                         val query = database.from(Students)
-                            .select(Students.firstName, Students.lastName, Students.nationalCode, min(Students.average))
-                            .where { Students.clientId eq clientId }
-                        write(query.totalRecords.toString())
+                            .select(Students.firstName, Students.lastName, Students.nationalCode, Students.average)
+                            .where { Students.clientId eq clientId }.orderBy(Students.average.asc()).limit(1)
+                        write("1")
                         query.forEach { row ->
                             write("${row[Students.firstName]},${row[Students.lastName]},${row[Students.nationalCode]},${row[Students.average]}")
                         }
                     }
                     "max" -> {
                         val query = database.from(Students)
-                            .select(Students.firstName, Students.lastName, Students.nationalCode, max(Students.average))
-                            .where { Students.clientId eq clientId }
-                        write(query.totalRecords.toString())
+                            .select(Students.firstName, Students.lastName, Students.nationalCode, Students.average)
+                            .where { Students.clientId eq clientId }.orderBy(Students.average.desc()).limit(1)
+                        write("1")
                         query.forEach { row ->
                             write("${row[Students.firstName]},${row[Students.lastName]},${row[Students.nationalCode]},${row[Students.average]}")
                         }
